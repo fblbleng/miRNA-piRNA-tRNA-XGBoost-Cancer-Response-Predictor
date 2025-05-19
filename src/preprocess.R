@@ -12,4 +12,4 @@ library(scales)
 library(tibble)
 ```
 
-# 1. Load Datasets
+1. **Load Datasets**
