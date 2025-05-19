@@ -12,4 +12,21 @@ library(scales)
 library(tibble)
 ```
 
-## 1. Load Datasets
+1. Load Datasets
+
+```{r setup, include=FALSE}
+# Load RNA CSVs
+load_rna_csv <- function(path) {
+  df <- read_csv(path)
+  rownames(df) <- df[[1]]
+  df <- df[, -1]
+  return(df)
+}
+
+mirna <- load_rna_csv("data/mirna.csv")
+pirna <- load_rna_csv("data/pirna.csv")
+trna  <- load_rna_csv("data/trna.csv")
+
+# Preview
+head(mirna[, 1:5])
+```
