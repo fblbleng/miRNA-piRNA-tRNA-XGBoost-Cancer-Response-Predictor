@@ -3,7 +3,7 @@
 
 This project implements a machine learning pipeline that integrates **miRNA**, **piRNA**, and **tRNA** datasets to predict the **treatment response** in cancer patients using **XGBoost**.
 
-## 🧪 Pipeline Overview
+## Pipeline Overview
 
 1. **Data Integration**: Merge and normalize multi-RNA data.
 2. **Feature Engineering**: Construct combined feature matrix.
@@ -12,11 +12,11 @@ This project implements a machine learning pipeline that integrates **miRNA**, *
 5. **Evaluation**: Performance metrics, ROC, confusion matrix.
 
 
-## 🧬 Data Files
+## Data Files
 - `mirna.csv`, `pirna.csv`, `trna.csv`: Feature tables with patient IDs
 - `metadata.csv`: Contains labels (e.g., `patient_id`, `response`)
 
-## 🚀 Getting Started
+## Getting Started
 ```bash
 git clone https://github.com/yourusername/rna-xgboost-response.git
 cd rna-xgboost-response
