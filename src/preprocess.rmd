@@ -14,57 +14,88 @@ library(tibble)
 
 1. Load Datasets
 
-# Load RNA CSVs
-load_rna_csv <- function(path) {
-  df <- read_csv(path)
-  rownames(df) <- df[[1]]
-  df <- df[, -1]
+# Define helper function to load and prepare each dataset
+load_rna_data <- function(path) {
+  if (!file.exists(path)) stop(paste("File not found:", path))
+  df <- read_csv(path, show_col_types = FALSE)
+  df <- column_to_rownames(df, var = names(df)[1])
   return(df)
 }
 
-mirna <- load_rna_csv("data/mirna.csv")
-pirna <- load_rna_csv("data/pirna.csv")
-trna  <- load_rna_csv("data/trna.csv")
+# Paths
+mirna_path <- "data/mirna.csv"
+pirna_path <- "data/pirna.csv"
+trna_path  <- "data/trna.csv"
 
-# Preview
-head(mirna[, 1:5])
+# Load datasets
+mirna <- load_rna_data(mirna_path)
+pirna <- load_rna_data(pirna_path)
+trna  <- load_rna_data(trna_path)
+
+# Show dataset summaries
+list(
+  miRNA = dim(mirna),
+  piRNA = dim(pirna),
+  tRNA  = dim(trna)
+)
+
 
 2. Merge by Patient ID
 
-merge_rna_data <- function(m1, p1, t1) {
-  common_ids <- Reduce(intersect, list(rownames(m1), rownames(p1), rownames(t1)))
-  merged <- cbind(m1[common_ids, ], p1[common_ids, ], t1[common_ids, ])
+merge_rna_data <- function(...) {
+  data_list <- list(...)
+  common_ids <- Reduce(intersect, lapply(data_list, rownames))
+  merged <- do.call(cbind, lapply(data_list, function(df) df[common_ids, ]))
   return(merged)
 }
 
 merged_rna <- merge_rna_data(mirna, pirna, trna)
+
+# Dimensions of merged matrix
 dim(merged_rna)
+
 
 3. Normalize Features (Z-score)
 
 normalize_zscore <- function(df) {
-  return(as.data.frame(scale(df)))
+  df_scaled <- scale(df)
+  return(as.data.frame(df_scaled))
 }
 
 X <- normalize_zscore(merged_rna)
+
+# Summary of first few features
 summary(X[, 1:5])
 
 4. Load Metadata and Extract Response
 
-metadata <- read_csv("data/metadata.csv")
+# Load metadata
+metadata_path <- "data/metadata.csv"
 
-extract_labels <- function(meta_df, ids) {
-  filtered <- meta_df %>% filter(patient_id %in% ids)
+extract_response_labels <- function(meta_path, ids) {
+  metadata <- read_csv(meta_path, show_col_types = FALSE)
+  stopifnot(all(c("patient_id", "response") %in% names(metadata)))
+  
+  filtered <- metadata %>% filter(patient_id %in% ids)
   labels <- filtered$response
   names(labels) <- filtered$patient_id
-  return(labels[ids])
+  
+  labels <- labels[ids]  # Match order
+  return(labels)
 }
 
-y <- extract_labels(metadata, rownames(X))
+y <- extract_response_labels(metadata_path, rownames(X))
+
+# Class distribution
 table(y)
+
 
 5. Export Preprocessed Data
 
-write.csv(X, "results/preprocessed_features.csv", row.names = TRUE)
-write.csv(data.frame(patient_id = names(y), response = y), 
-          "results/response_labels.csv", row.names = FALSE)
+if (!dir.exists("results")) dir.create("results")
+
+write_csv(X, "results/preprocessed_features.csv")
+write_csv(tibble(patient_id = names(y), response = y), "results/response_labels.csv")
+
+cat(" Files saved:\n- results/preprocessed_features.csv\n- results/response_labels.csv")
+
