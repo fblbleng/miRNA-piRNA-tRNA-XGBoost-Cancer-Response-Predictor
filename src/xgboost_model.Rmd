@@ -1,0 +1,89 @@
+---
+title: "XGBoost Model for Predicting Cancer Treatment Response"
+author: "Fabiola Blengio"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+# Load required packages
+library(readr)
+library(dplyr)
+library(xgboost)
+library(caret)
+library(Matrix)
+library(ggplot2)
+library(pROC)
+📁 1. Load Preprocessed Data
+
+# Load features and labels
+X <- read_csv("results/preprocessed_features.csv", show_col_types = FALSE) %>%
+  column_to_rownames(var = "X1")  # Adjust column name if necessary
+
+labels <- read_csv("results/response_labels.csv", show_col_types = FALSE)
+y <- as.factor(labels$response)
+names(y) <- labels$patient_id
+
+# Align labels to features
+y <- y[rownames(X)]
+
+# Check dimensions and class distribution
+list(Dimensions = dim(X), ClassDistribution = table(y))
+🔀 2. Prepare Data for XGBoost
+
+
+# Convert to xgb.DMatrix
+X_mat <- as.matrix(X)
+label_num <- as.numeric(y) - 1  # XGBoost needs 0/1 labels
+
+dtrain <- xgb.DMatrix(data = X_mat, label = label_num)
+⚙️ 3. Cross-Validation & Training
+
+# Set parameters
+params <- list(
+  objective = "binary:logistic",
+  eval_metric = "auc",
+  max_depth = 4,
+  eta = 0.1,
+  verbosity = 0
+)
+
+# Cross-validation to estimate performance
+set.seed(123)
+cv <- xgb.cv(
+  params = params,
+  data = dtrain,
+  nrounds = 100,
+  nfold = 5,
+  stratified = TRUE,
+  print_every_n = 10,
+  early_stopping_rounds = 10,
+  maximize = TRUE
+)
+
+# Best number of rounds
+best_nrounds <- cv$best_iteration
+
+# Train final model
+final_model <- xgb.train(
+  params = params,
+  data = dtrain,
+  nrounds = best_nrounds
+)
+📈 4. Feature Importance
+
+importance <- xgb.importance(model = final_model)
+head(importance)
+
+# Plot top features
+xgb.plot.importance(importance_matrix = importance, top_n = 20, rel_to_first = TRUE)
+📊 5. Evaluate on Holdout (Optional)
+
+# Optional: Create train/test split and repeat with separate test data
+# Not done here to keep pipeline simple (uses full CV above)
+
+💾 Optional: Save Model (Uncomment to use)
+
+xgb.save(final_model, "results/xgb_model.bin")
+write_csv(as.data.frame(importance), "results/xgb_feature_importance.csv")
