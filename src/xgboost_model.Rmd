@@ -15,8 +15,11 @@ library(caret)
 library(Matrix)
 library(ggplot2)
 library(pROC)
+```
+
 📁 1. Load Preprocessed Data
 
+```{r}
 # Load features and labels
 X <- read_csv("results/preprocessed_features.csv", show_col_types = FALSE) %>%
   column_to_rownames(var = "X1")  # Adjust column name if necessary
@@ -30,6 +33,9 @@ y <- y[rownames(X)]
 
 # Check dimensions and class distribution
 list(Dimensions = dim(X), ClassDistribution = table(y))
+```
+
+
 🔀 2. Prepare Data for XGBoost
 
 
