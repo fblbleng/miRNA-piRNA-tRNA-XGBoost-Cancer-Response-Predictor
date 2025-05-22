@@ -83,7 +83,9 @@ xgb.plot.importance(importance_matrix = importance, top_n = 20, rel_to_first = T
 # Optional: Create train/test split and repeat with separate test data
 # Not done here to keep pipeline simple (uses full CV above)
 
-💾 Optional: Save Model (Uncomment to use)
+💾 Optional: Save Mode
 
 xgb.save(final_model, "results/xgb_model.bin")
 write_csv(as.data.frame(importance), "results/xgb_feature_importance.csv")
+```
+
