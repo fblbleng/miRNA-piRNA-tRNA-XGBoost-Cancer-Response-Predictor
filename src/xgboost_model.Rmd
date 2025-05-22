@@ -38,14 +38,15 @@ list(Dimensions = dim(X), ClassDistribution = table(y))
 
 🔀 2. Prepare Data for XGBoost
 
-
+```{r}
 # Convert to xgb.DMatrix
 X_mat <- as.matrix(X)
 label_num <- as.numeric(y) - 1  # XGBoost needs 0/1 labels
 
 dtrain <- xgb.DMatrix(data = X_mat, label = label_num)
+```
 ⚙️ 3. Cross-Validation & Training
-
+```{r}
 # Set parameters
 params <- list(
   objective = "binary:logistic",
@@ -77,8 +78,11 @@ final_model <- xgb.train(
   data = dtrain,
   nrounds = best_nrounds
 )
+```
+
 📈 4. Feature Importance
 
+```{r}
 importance <- xgb.importance(model = final_model)
 head(importance)
 
