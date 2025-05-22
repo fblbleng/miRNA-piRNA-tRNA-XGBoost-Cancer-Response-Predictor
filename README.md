@@ -2,7 +2,7 @@
 
 This repository contains an R-based pipeline that integrates miRNA, piRNA, and tRNA expression datasets to predict treatment response in cancer patients using XGBoost.
 
-### 🔬 Workflow Overview
+###  Workflow Overview
 
 1. **Preprocessing**
    - Load and clean RNA datasets
@@ -15,14 +15,14 @@ This repository contains an R-based pipeline that integrates miRNA, piRNA, and t
    - Feature importance analysis
    - Output top predictive RNA signatures
 
-### 📁 Directory Structure
+###  Directory Structure
 
 - `data/` - Input RNA and metadata CSVs
 - `results/` - Preprocessed data and model outputs
 - `scripts/` - R scripts and notebooks
 - `README.md` - Project overview
 
-### 🧬 Scripts
+###  Scripts
 
 #### `scripts/01_preprocess_rna.Rmd`
 
@@ -39,7 +39,7 @@ This will:
 - Train an XGBoost classifier
 - Output feature importance and AUC metrics
 
-### 📦 Dependencies
+###  Dependencies
 
 Install required R packages:
 
